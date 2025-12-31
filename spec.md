@@ -22,12 +22,11 @@ This project is engineered to bridge the gap between "Web Developer" and "System
 ### 3.2. Video Processing (The Transcoding Layer)
 *   **Format Normalization:** Ingested videos (which may be `.mov`, `.avi`, `.mkv`) must be converted to a standardized web-ready container (MP4/TS).
 *   **Adaptive Bitrate Generation:** The system must generate multiple quality variants for every uploaded video:
-    *   **1080p (High)**
-    *   **720p (Medium)**
-    *   **480p (Low)**
-    *   **360p (Mobile)**
+    *   **720p (High)**
+    *   **360p (Low)**
 *   **HLS Segmentation:** The video must be sliced into small time-based chunks (segments) and indexed via an `.m3u8` playlist file.
-*   **Pipeline Processing:** Processing should ideally begin as soon as enough data is buffered, rather than waiting for the entire upload to finish (Stream-based processing).
+*   **Event-Driven Processing:** Processing should begin once the upload is complete. The system should queue a transcoding job.
+*   **Pipeline Processing (Stretch Goal):** Ideally begin processing as soon as enough data is buffered, rather than waiting for the entire upload to finish (Stream-based processing).
 
 ### 3.3. Content Delivery (The Streaming Layer)
 *   **Adaptive Playback:** The backend must serve the correct `.m3u8` playlists allowing the client player to switch resolution based on network bandwidth.
@@ -40,28 +39,21 @@ This project is engineered to bridge the gap between "Web Developer" and "System
 
 ## 4. Technical Architecture & Stack Strategy
 
-### 4.1. The "Control Plane" (Node.js)
-*   **Role:** Acts as the brain of the operation. Handles lightweight, I/O-bound tasks.
+### 4.1. The "Unified Backend" (Bun)
+*   **Role:** A Modular Monolith handling both business logic and system operations.
 *   **Responsibilities:**
-    *   User Authentication & Authorization.
-    *   Video Metadata Management (Title, Description, Duration).
-    *   Orchestrating the upload lifecycle (handshaking with the upload client).
-    *   Serving the Frontend application.
+    *   **API Module:** User Auth, Metadata, and Database interactions (SQLite via `bun:sqlite`).
+    *   **Ingestion Module:** TUS Protocol implementation for handling binary uploads.
+    *   **Worker Module:** FFmpeg process orchestration using `Bun.spawn` for high-performance transcoding.
+    *   **Stream Delivery:** Serving static HLS assets efficiently.
 
-### 4.2. The "Data Plane" (Golang)
-*   **Role:** The heavy lifter. Handles CPU-intensive and memory-sensitive tasks.
-*   **Responsibilities:**
-    *   **Ingestion Server:** Implementing the TUS protocol server-side to receive binary chunks and assemble them.
-    *   **Transcoding Engine:** A worker pool that manages FFmpeg subprocesses. It feeds raw video data into FFmpeg and pipes the output to storage.
-    *   **Stream Delivery:** A high-performance static file server optimized for serving `.ts` segments and playlists.
-
-### 4.3. Storage Layer
+### 4.2. Storage Layer
 *   **Raw Storage:** A structured local filesystem directory (mimicking an Object Store structure like S3 buckets).
     *   `temp/`: For partial chunks during upload.
     *   `raw/`: For the assembled master file.
     *   `processed/{video_id}/`: For the HLS playlists and segments.
 
-### 4.4. Frontend (React + TypeScript)
+### 4.3. Frontend (React + TypeScript)
 *   **Upload Client:** Usage of a specialized TUS client library to handle the complexity of chunking and retries.
 *   **Video Player:** Integration with a video framework (e.g., Video.js) that supports HLS playback natively.
 
@@ -87,7 +79,7 @@ The core engine for video manipulation. We will not write video encoding logic f
 
 ## 6. Development Phases
 
-1.  **Phase 1: The Pipeline:** Build the Golang CLI tool that takes a file, runs FFmpeg, and outputs HLS segments. This proves the core logic works without a web server.
-2.  **Phase 2: The Ingest:** Implement the TUS server in Golang to accept file uploads via HTTP.
-3.  **Phase 3: Integration:** Connect the Upload to the Processing pipeline.
-4.  **Phase 4: The Experience:** Build the React frontend and Node.js API to manage the library.
+1.  **Phase 1: The Pipeline:** Build the Bun/TypeScript CLI tool that takes a file, runs FFmpeg (via `Bun.spawn`), and outputs HLS segments. This proves the core logic works without a web server.
+2.  **Phase 2: The Ingest:** Implement the TUS server in Bun to accept file uploads via HTTP.
+3.  **Phase 3: Integration:** Connect the Upload to the Processing pipeline within the monolithic application.
+4.  **Phase 4: The Experience:** Build the React frontend and integrate with the Bun API.
