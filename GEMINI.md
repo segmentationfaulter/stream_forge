@@ -10,8 +10,8 @@
 
 The specification and architectural planning phases are complete. We are now entering the implementation phase.
 
-- **Current Focus:** Phase 1 (The Pipeline) - Milestone 1: Project Skeleton & Configuration.
-- **Status:** Ready to initialize the backend codebase using Bun 1.3.5.
+- **Current Focus:** Phase 1 (The Pipeline) - Milestone 2: Domain Types & FFmpeg Command Strategy.
+- **Status:** Milestone 1 complete. Backend project initialized with Bun, directory structure created.
 
 ## 3. Technical Architecture
 
@@ -56,4 +56,5 @@ As an AI agent or Developer, use this repository to:
 - **Milestone Isolation:** When implementing a milestone, strictly focus on the requirements of that specific milestone. Do not implement logic intended for future milestones.
 - **Explicit Approval Required:** Do not begin the implementation of any milestone until the user has given an explicit go-ahead for it.
 - **Iterative Planning:** Each phase must be divided into manageable, testable milestones before implementation begins.
+- **Update Status:** Always update GEMINI.md with the latest project status after completing a milestone.
 
