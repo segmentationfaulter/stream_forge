@@ -36,33 +36,23 @@ export const transcodeVideo = async (options: TranscodeOptions): Promise<void> =
   // We buffer the stderr to provide context in case of a crash.
   // Using a simple array of strings as a buffer.
   const stderrBuffer: string[] = [];
-  const reader = proc.stderr.getReader();
   const decoder = new TextDecoder();
 
-  // Background task to consume the stderr stream
-  const logTask = (async () => {
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const text = decoder.decode(value);
-        stderrBuffer.push(text);
-        
-        // In a real production environment, we would parse 'text' for 
-        // "time=00:00:00" to calculate percentage-based progress.
-        // For now, we just keep the buffer for error reporting.
-      }
-    } catch (err) {
-      console.error("[Transcoder] Error reading stderr stream:", err);
+  // Consume the stderr stream directly
+  // This loop will run until the stream closes (when FFmpeg exits)
+  try {
+    for await (const chunk of proc.stderr) {
+      const text = decoder.decode(chunk);
+      stderrBuffer.push(text);
+      
+      // Optional: Real-time progress parsing would go here
     }
-  })();
+  } catch (err) {
+     console.error("[Transcoder] Error reading stderr stream:", err);
+  }
 
-  // Wait for the process to exit
+  // By the time the loop above finishes, the process has essentially finished writing.
   const exitCode = await proc.exited;
-  
-  // Ensure the log reading task finishes
-  await logTask;
 
   if (exitCode !== 0) {
     const fullLog = stderrBuffer.join("");
