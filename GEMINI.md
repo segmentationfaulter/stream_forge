@@ -10,8 +10,8 @@
 
 The specification and architectural planning phases are complete. We are now entering the implementation phase.
 
-- **Current Focus:** Phase 1 (The Pipeline) - Milestone 3: Process Orchestration (The Engine).
-- **Status:** Milestone 2 complete. Domain types defined and FFmpeg argument builder implemented.
+- **Current Focus:** Phase 1 (The Pipeline) - Milestone 4: The CLI Entry Point.
+- **Status:** Milestone 3 complete. FFmpeg orchestration logic implemented using Bun.spawn with stderr capturing.
 
 ## 3. Technical Architecture
 

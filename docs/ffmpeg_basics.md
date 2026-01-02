@@ -78,3 +78,13 @@ Tells FFmpeg to use all available CPU cores. This is usually the default, but ex
 
 - [Ultimate FFmpeg Guide](https://img.ly/blog/ultimate-guide-to-ffmpeg/)
 - [A Guide to Batch Video Editing & Server Automation with FFmpeg](https://img.ly/blog/building-a-production-ready-batch-video-processing-server-with-ffmpeg/)
+
+## 6. Logging & Debugging (Stderr vs Stdout)
+
+A common point of confusion is how FFmpeg handles output.
+
+-   **`stdout` (Standard Output):** Reserved strictly for **binary video data** when piping (e.g., `ffmpeg -i input -f rawvideo - | player`).
+-   **`stderr` (Standard Error):** Used for **everything else**, including progress bars, statistics, warnings, and informational logs.
+
+**Implication for Developers:**
+Even if FFmpeg succeeds (Exit Code 0), it will write a massive amount of text to `stderr`. Do not assume that content in `stderr` means the process failed. You must rely on the **Exit Code** to determine success or failure.
