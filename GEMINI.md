@@ -10,8 +10,8 @@
 
 The specification and architectural planning phases are complete. We are now entering the implementation phase.
 
-- **Current Focus:** Phase 1 (The Pipeline) - Milestone 4: The CLI Entry Point.
-- **Status:** Milestone 3 complete. FFmpeg orchestration logic implemented using Bun.spawn with stderr capturing.
+- **Current Focus:** Phase 1 (The Pipeline) - Milestone 5: Verification.
+- **Status:** Milestone 4 complete. CLI entry point implemented for manual transcoding tests.
 
 ## 3. Technical Architecture
 
@@ -58,4 +58,5 @@ As an AI agent or Developer, use this repository to:
 - **Iterative Planning:** Each phase must be divided into manageable, testable milestones before implementation begins.
 - **Update Status:** Always update GEMINI.md with the latest project status after completing a milestone.
 - **Documentation:** Add extensive documentation to any critical piece of code as comments.
+- **Centralized Configuration:** Any piece of code needing to use profiles should look in `backend/src/config.ts`.
 
