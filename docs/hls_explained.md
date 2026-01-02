@@ -7,6 +7,7 @@ HLS is not just a file format; it's a delivery protocol. It shifts the complexit
 You need to generate a hierarchy of files.
 
 ### A. The Master Playlist (`master.m3u8`)
+
 This file is the entry point. It describes the **Variants** (different quality levels).
 
 ```m3u8
@@ -25,10 +26,12 @@ This file is the entry point. It describes the **Variants** (different quality l
 #EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=640x360,CODECS="avc1.4d401e,mp4a.40.2"
 360p/index.m3u8
 ```
-*   `BANDWIDTH`: The peak bitrate in bits/sec. The player uses this to decide if it can afford this stream.
-*   `CODECS`: Tells the player exactly what is inside so it doesn't crash trying to play unsupported formats.
+
+- `BANDWIDTH`: The peak bitrate in bits/sec. The player uses this to decide if it can afford this stream.
+- `CODECS`: Tells the player exactly what is inside so it doesn't crash trying to play unsupported formats.
 
 ### B. The Media Playlist (`1080p/index.m3u8`)
+
 This file lists the actual segments for **one specific quality**.
 
 ```m3u8
@@ -49,6 +52,7 @@ segment_002.ts
 ```
 
 ### C. The Segments (`.ts`)
+
 These are standard MPEG-TS files containing H.264 video and AAC audio. They are playable on their own (mostly).
 
 ---
@@ -58,14 +62,14 @@ These are standard MPEG-TS files containing H.264 video and AAC audio. They are 
 This is the logic running inside the Video Player (Frontend).
 
 1.  **Buffer-Based Strategy:**
-    *   The player tries to keep a safety buffer (e.g., 30 seconds of video loaded ahead).
-    *   **Scenario:** Buffer is full (30s). Player logic: "I'm safe. I'll try to download the highest quality (1080p)."
-    *   **Scenario:** Buffer is dropping (only 5s left). Player logic: "Panic! Download the smallest file possible (360p) just to keep playing!"
+    - The player tries to keep a safety buffer (e.g., 30 seconds of video loaded ahead).
+    - **Scenario:** Buffer is full (30s). Player logic: "I'm safe. I'll try to download the highest quality (1080p)."
+    - **Scenario:** Buffer is dropping (only 5s left). Player logic: "Panic! Download the smallest file possible (360p) just to keep playing!"
 
 2.  **Throughput-Based Strategy:**
-    *   The player measures how long it took to download the last chunk.
-    *   `Size (5MB) / Time (2s) = 2.5 MB/s (20 Mbps)`.
-    *   "I have 20 Mbps speed. I can comfortably play the 5 Mbps stream."
+    - The player measures how long it took to download the last chunk.
+    - `Size (5MB) / Time (2s) = 2.5 MB/s (20 Mbps)`.
+    - "I have 20 Mbps speed. I can comfortably play the 5 Mbps stream."
 
 ---
 
@@ -91,7 +95,7 @@ sequenceDiagram
     Note over Player: Download taking too long...
     Player->>Player: Decision: Switch to 360p
     Player->>Server: GET 360p/index.m3u8
-    
+
     Note over Player: Seamlessly append 360p chunk
     Player->>Server: GET 360p/seg5.ts
     Player->>User: Video continues (Low Res)
@@ -100,13 +104,18 @@ sequenceDiagram
 ## 4. Key Challenges for Implementation
 
 1.  **Segment Alignment:**
-    *   Chunk 5 of the 1080p stream MUST start at the exact same millisecond as Chunk 5 of the 360p stream.
-    *   If they don't align, when the player switches quality, the video will jump or stutter.
-    *   *Solution:* Fixed GOP size in FFmpeg (See `ffmpeg_basics.md`).
+    - Chunk 5 of the 1080p stream MUST start at the exact same millisecond as Chunk 5 of the 360p stream.
+    - If they don't align, when the player switches quality, the video will jump or stutter.
+    - _Solution:_ Fixed GOP size in FFmpeg (See `ffmpeg_basics.md`).
 
 2.  **Manifest Generation:**
-    *   You can't hand-write these `.m3u8` files.
-    *   FFmpeg can generate them automatically using the `hls` muxer.
+    - You can't hand-write these `.m3u8` files.
+    - FFmpeg can generate them automatically using the `hls` muxer.
 
 3.  **CORS:**
-    *   Since video segments are loaded via XHR/Fetch by the player logic, your file server MUST return correct CORS headers (`Access-Control-Allow-Origin: *`), or the browser will block the stream.
+    - Since video segments are loaded via XHR/Fetch by the player logic, your file server MUST return correct CORS headers (`Access-Control-Allow-Origin: *`), or the browser will block the stream.
+
+## 5. Readings
+
+- [HLS Basics](https://larryjordan.com/articles/basics-of-http-live-streaming/)
+- [A Guide to HLS](https://www.mux.com/articles/a-guide-to-http-live-streaming-hls-overview-definition-and-considerations)

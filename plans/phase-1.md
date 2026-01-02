@@ -44,3 +44,13 @@
     - `master.m3u8` exists.
     - `720p/` and `360p/` folders exist with `.ts` segments.
     - Play the `master.m3u8` in a local player (like VLC or a simple HTML wrapper).
+
+## Milestone 6: Production Polish
+- [ ] Update `buildFFmpegArgs` to include critical HLS flags:
+    - **GOP Alignment:** `-g`, `-keyint_min`, `-sc_threshold 0` (Crucial for ABR switching).
+    - **Compatibility:** `-pix_fmt yuv420p` (For browser playback).
+    - **Optimization:** `-preset veryfast` (Development speed) or `medium` (Production).
+- [ ] Implement **Input Probing & Dynamic Profile Selection**:
+    - Use `ffprobe` to detect input resolution.
+    - Filter out profiles that would cause upscaling (e.g., don't generate 720p from 480p source).
+- [ ] Verify that the generated stream still plays correctly.
