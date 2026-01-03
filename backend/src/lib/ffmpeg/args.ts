@@ -53,6 +53,20 @@ export const buildFFmpegArgs = (options: TranscodeOptions): string[] => {
     "-y", // Overwrite output files
   ];
 
+  // Production Polish Flags
+  args.push(
+    "-preset",
+    "veryfast", // Speed up encoding for dev/test
+    "-g",
+    "60", // Force 2-second GOP (assuming 30fps)
+    "-keyint_min",
+    "60", // Minimum keyframe interval
+    "-sc_threshold",
+    "0", // Disable scene change detection for fixed GOP
+    "-pix_fmt",
+    "yuv420p", // Ensure web compatibility (8-bit color)
+  );
+
   // Map streams and set quality for each profile
   profiles.forEach((profile, index) => {
     args.push("-map", "0:v:0");
@@ -73,17 +87,15 @@ export const buildFFmpegArgs = (options: TranscodeOptions): string[] => {
     "master.m3u8",
   );
 
-    // Map variants to specific folders
+  // Map variants to specific folders
 
-    // Format: "v:0,a:0 v:1,a:1"
+  // Format: "v:0,a:0 v:1,a:1"
 
-    const streamMap = profiles
+  const streamMap = profiles
 
-      .map((_, index) => `v:${index},a:${index}`)
+    .map((_, index) => `v:${index},a:${index}`)
 
-      .join(" ");
-
-  
+    .join(" ");
 
   args.push("-var_stream_map", streamMap);
 

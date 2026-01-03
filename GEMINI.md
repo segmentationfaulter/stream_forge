@@ -6,12 +6,12 @@
 
 **Core Mission:** To bridge the gap between "Web Development" (REST APIs, JSON) and "Systems Engineering" (Binary streams, Process orchestration, I/O efficiency).
 
-## 2. Repository Status: Implementation Phase (Phase 1)
+## 2. Repository Status: Phase 2 (The Ingest)
 
-The specification and architectural planning phases are complete. We are now entering the implementation phase.
+The transcoding pipeline (Phase 1) is complete and verified. We are now building the upload infrastructure.
 
-- **Current Focus:** Phase 1 (The Pipeline) - Milestone 6: Production Polish.
-- **Status:** Milestone 5 complete. CLI verified with sample video; HLS output generated and validated.
+- **Current Focus:** Phase 2 (The Ingest) - Milestone 1: TUS Server Setup.
+- **Status:** Phase 1 complete. CLI tool fully functional with probing, production flags, and multi-variant HLS generation.
 
 ## 3. Technical Architecture
 

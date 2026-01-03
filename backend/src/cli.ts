@@ -1,5 +1,6 @@
 import { parseArgs } from "util";
 import { transcodeVideo } from "./lib/ffmpeg/transcoder";
+import { probeVideo } from "./lib/ffmpeg/probe";
 import { DEFAULT_TRANSCODE_PROFILES } from "./config";
 
 /**
@@ -42,12 +43,40 @@ const main = async () => {
   console.log(`[CLI] Starting job for: ${values.input}`);
 
   try {
+    // 1. Probe the input file to get resolution/metadata
+    console.log(`[CLI] Probing input file...`);
+    const metadata = await probeVideo(values.input);
+    console.log(
+      `[CLI] Input detected: ${metadata.width}x${metadata.height} @ ${metadata.fps.toFixed(2)}fps`,
+    );
+
+    // 2. Filter profiles to avoid upscaling
+    // We only keep profiles where the height is <= input height
+    // If the input is weird (e.g. 500p), we accept 360p but reject 720p.
+    const validProfiles = DEFAULT_TRANSCODE_PROFILES.filter(
+      (p) => p.height <= metadata.height,
+    );
+
+    if (validProfiles.length === 0) {
+      console.warn(
+        "[CLI] Warning: Input resolution is lower than all target profiles.",
+      );
+      console.warn("[CLI] Using the lowest quality profile by default.");
+      validProfiles.push(
+        DEFAULT_TRANSCODE_PROFILES.find((p) => p.name === "360p")!,
+      );
+    }
+
+    console.log(
+      `[CLI] Selected Profiles: ${validProfiles.map((p) => p.name).join(", ")}`,
+    );
+
     const startTime = performance.now();
 
     await transcodeVideo({
       inputPath: values.input,
       outputDir: values.output,
-      profiles: DEFAULT_TRANSCODE_PROFILES,
+      profiles: validProfiles,
     });
 
     const duration = ((performance.now() - startTime) / 1000).toFixed(2);
@@ -57,5 +86,4 @@ const main = async () => {
     process.exit(1);
   }
 };
-
 main();
