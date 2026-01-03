@@ -37,7 +37,7 @@ import type { TranscodeOptions } from "../../types/ffmpeg";
  *   -hls_time 10 \                     # Segment length: 10 seconds
  *   -hls_playlist_type vod \           # Type: VOD (static file, not live event)
  *   -master_pl_name master.m3u8 \      # Name of the root manifest
- *   -var_stream_map "v:0,a:0 v:1,a:0" \# Grouping: Combine Video 0+Audio 0, and Video 1+Audio 1
+ *   -var_stream_map "v:0,a:0 v:1,a:1" \# Grouping: Combine Video 0+Audio 0, and Video 1+Audio 1
  *   output/%v/index.m3u8               # Output path pattern (%v becomes the variant index)
  * ```
  */
@@ -73,9 +73,17 @@ export const buildFFmpegArgs = (options: TranscodeOptions): string[] => {
     "master.m3u8",
   );
 
-  // Map variants to specific folders
-  // Format: "v:0,a:0 v:1,a:0"
-  const streamMap = profiles.map((_, index) => `v:${index},a:0`).join(" ");
+    // Map variants to specific folders
+
+    // Format: "v:0,a:0 v:1,a:1"
+
+    const streamMap = profiles
+
+      .map((_, index) => `v:${index},a:${index}`)
+
+      .join(" ");
+
+  
 
   args.push("-var_stream_map", streamMap);
 

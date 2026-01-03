@@ -10,8 +10,8 @@
 
 The specification and architectural planning phases are complete. We are now entering the implementation phase.
 
-- **Current Focus:** Phase 1 (The Pipeline) - Milestone 5: Verification.
-- **Status:** Milestone 4 complete. CLI entry point implemented for manual transcoding tests.
+- **Current Focus:** Phase 1 (The Pipeline) - Milestone 6: Production Polish.
+- **Status:** Milestone 5 complete. CLI verified with sample video; HLS output generated and validated.
 
 ## 3. Technical Architecture
 
