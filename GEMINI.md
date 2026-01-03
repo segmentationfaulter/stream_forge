@@ -35,7 +35,7 @@ The system is designed with a **Unified Modular Monolith** architecture:
 The project is divided into 4 distinct execution phases:
 
 - **Phase 1: The Pipeline (Bun)** - Build a CLI tool to transcode files to HLS using FFmpeg. [View Plan](plans/phase-1.md)
-- **Phase 2: The Ingest (Bun)** - Implement a TUS-compliant HTTP server for resumable uploads.
+- **Phase 2: The Ingest (Bun)** - Implement a TUS-compliant HTTP server for resumable uploads. [View Plan](plans/phase-2.md)
 - **Phase 3: Integration** - Connect Uploads -> Processing.
 - **Phase 4: The Experience (React)** - Build the user-facing web app.
 
