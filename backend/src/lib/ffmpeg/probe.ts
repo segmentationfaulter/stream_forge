@@ -1,24 +1,8 @@
 /**
  * Uses ffprobe to extract metadata from a video file.
  */
-export type VideoMetadata = {
-  width: number;
-  height: number;
-  duration: number;
-  fps: number;
-};
 
-type FFProbeOutput = {
-  streams: Array<{
-    codec_type: string;
-    width: number;
-    height: number;
-    r_frame_rate: string;
-  }>;
-  format: {
-    duration: string;
-  };
-};
+import type { FFProbeOutput, VideoMetadata } from "../../types/ffmpeg";
 
 export const probeVideo = async (inputPath: string): Promise<VideoMetadata> => {
   const args = [
