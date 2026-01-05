@@ -1,43 +1,29 @@
-# Phase 2: The Ingest (Plan)
+# Phase 2: The Ingest (Library-First TUS)
 
-**Goal:** Implement a TUS-compliant HTTP server using Bun that supports resumable, chunked file uploads. This replaces standard `multipart/form-data` uploads with a robust protocol capable of handling unstable network connections.
+**Goal:** Implement a modular, protocol-compliant TUS server in Bun that is decoupled from the main application logic, making it suitable for future extraction as a standalone npm package.
 
-## Milestone 1: Server Skeleton & TUS Creation (POST)
-- [ ] Create `src/server.ts` as the main HTTP entry point.
-- [ ] Implement a basic Bun HTTP server (`Bun.serve`).
-- [ ] Create `src/lib/tus/handler.ts` to manage TUS logic.
-- [ ] Implement the **POST** handler:
-    - [ ] Generate unique Upload IDs (UUID).
-    - [ ] Read `Upload-Length` and `Upload-Metadata` headers.
-    - [ ] Create empty files (`.bin` and `.json` metadata) in `storage/uploads/`.
-    - [ ] Return `201 Created` with the `Location` header.
+## Milestone 1: Architecture & Contracts
+- [ ] Define the `DataStore` interface (`src/lib/tus/interfaces/DataStore.ts`) - the contract for storage drivers (create, append, getStat, etc.).
+- [ ] Define `TusConfig` and `TusRequest/Response` types (`src/lib/tus/types.ts`) to ensure framework agnosticism.
+- [ ] Create the `TusServer` class skeleton (`src/lib/tus/index.ts`) - the main entry point that dispatches requests to handlers.
 
-## Milestone 2: The Upload Mechanism (PATCH)
-- [ ] Implement the **PATCH** handler in `src/lib/tus/handler.ts`:
-    - [ ] Validate `Upload-Offset` against the current file size on disk.
-    - [ ] Stream the request body (binary chunk) and append it to the `.bin` file.
-    - [ ] Update the `.json` metadata with the new offset.
-    - [ ] Return `204 No Content` with the new `Upload-Offset`.
-- [ ] **Critical:** Ensure using `Bun.file().writer()` or Node streams for efficient appending to avoid loading the whole file into RAM.
+## Milestone 2: The Storage Driver
+- [ ] Implement `FileStore` class (`src/lib/tus/stores/FileStore.ts`) implementing `DataStore`.
+- [ ] Implement file locking mechanism within `FileStore` to ensure concurrency safety.
+- [ ] Ensure `FileStore` handles `Bun.file()` and streams efficiently using non-blocking I/O.
 
-## Milestone 3: Resumability & Status (HEAD)
-- [ ] Implement the **HEAD** handler:
-    - [ ] Check if the Upload ID exists.
-    - [ ] Read the current file size (offset) from disk.
-    - [ ] Return `200 OK` with `Upload-Offset` and `Upload-Length` headers.
-- [ ] **Why?** This allows clients to ask "Where did we leave off?" after a crash and resume exactly from that byte.
+## Milestone 3: Protocol Core (POST & HEAD)
+- [ ] Implement `handlePost` - generic logic for creating uploads, validating headers, and calling `store.create()`.
+- [ ] Implement `handleHead` - generic logic for checking status, calling `store.getStat()`.
+- [ ] Ensure strict TUS header compliance (e.g., `Tus-Resumable`, `Upload-Length`, `Upload-Offset`).
 
-## Milestone 4: Safety & Concurrency (The Lock)
-- [ ] Implement a simple File Locking mechanism (`src/lib/tus/lock.ts`):
-    - [ ] Before writing to a file (PATCH), acquire a lock (e.g., create a `.lock` file).
-    - [ ] If locked, return `423 Locked`.
-    - [ ] Release lock after writing.
-- [ ] **Why?** Prevents data corruption if a user (or two tabs) tries to patch the same file simultaneously.
+## Milestone 4: The Upload Mechanism (PATCH)
+- [ ] Implement `handlePatch` - generic logic for appending chunks.
+- [ ] Validate `Upload-Offset` against current storage size.
+- [ ] Call `store.append()` with the request body stream.
+- [ ] Handle error states (e.g., offset mismatch, lock contention).
 
-## Milestone 5: Verification (The TUS Client)
-- [ ] Create a simple test script `scripts/test-upload.ts` using a TUS client library (e.g., `tus-js-client`).
-- [ ] Simulate an upload:
-    - [ ] Start upload.
-    - [ ] Interrupt (kill script).
-    - [ ] Restart script -> Verify it resumes instead of restarting.
-- [ ] Verify the final binary file on disk matches the source file hash.
+## Milestone 5: Integration & Verification
+- [ ] Integrate `TusServer` into the main `src/server.ts` application.
+- [ ] Configure it with `FileStore` pointing to `storage/temp/`.
+- [ ] Create `scripts/test-upload.ts` to verify full upload lifecycle (Start -> Pause -> Resume -> Complete) using a standard TUS client library.

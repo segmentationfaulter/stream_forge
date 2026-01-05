@@ -56,6 +56,10 @@ As an AI agent or Developer, use this repository to:
 - **Milestone Isolation:** When implementing a milestone, strictly focus on the requirements of that specific milestone. Do not implement logic intended for future milestones.
 - **Explicit Approval Required:** Do not begin the implementation of any milestone until the user has given an explicit go-ahead for it.
 - **Iterative Planning:** Each phase must be divided into manageable, testable milestones before implementation begins.
+
+## 8. Architectural Decisions
+
+- **Library-First TUS Implementation:** The TUS protocol server is being built as a decoupled, standalone module within `src/lib/tus/`. This design ensures strict separation of concerns and allows for the future extraction of the module as an independent open-source package. It utilizes dependency injection for storage drivers (`DataStore` interface) and configuration.
 - **Update Status:** Always update GEMINI.md with the latest project status after completing a milestone.
 - **Documentation:** Add extensive documentation to any critical piece of code as comments.
 - **Centralized Configuration:** Any piece of code needing to use profiles should look in `backend/src/config.ts`.
