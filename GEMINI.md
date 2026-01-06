@@ -10,8 +10,8 @@
 
 The transcoding pipeline (Phase 1) is complete and verified. We are now building the upload infrastructure.
 
-- **Current Focus:** Phase 2 (The Ingest) - Milestone 1: TUS Server Setup.
-- **Status:** Phase 1 complete. CLI tool fully functional with probing, production flags, and multi-variant HLS generation.
+- **Current Focus:** Phase 2 (The Ingest) - Milestone 3: Protocol Core (POST & HEAD).
+- **Status:** Phase 2, Milestone 2 (The Storage Driver) complete. FileStore implemented with Bun.file and atomic locking.
 
 ## 3. Technical Architecture
 
@@ -29,6 +29,8 @@ The system is designed with a **Unified Modular Monolith** architecture:
 > The `spec.md` file is the **official specification** for this project and the **ultimate source of truth** for all requirements and implementation details.
 >
 > All documentation located in the `docs/` directory is for **educational purposes only**. These files are intended for personal learning and should **not** influence or dictate the project's official design, architecture, or implementation.
+
+1. [TUS Protocol Specification](https://tus.io/protocols/resumable-upload) - Core reference for resumable uploads.
 
 ## 5. Development Roadmap
 
@@ -60,6 +62,7 @@ As an AI agent or Developer, use this repository to:
 ## 8. Architectural Decisions
 
 - **Library-First TUS Implementation:** The TUS protocol server is being built as a decoupled, standalone module within `src/lib/tus/`. This design ensures strict separation of concerns and allows for the future extraction of the module as an independent open-source package. It utilizes dependency injection for storage drivers (`DataStore` interface) and configuration.
+- **TUS Extension Scope:** To maintain focus and avoid unnecessary complexity, the TUS implementation will only support extensions strictly required for StreamForge functionality (e.g., Creation). Other extensions like Checksum or Termination will only be added if a clear need arises.
 - **Update Status:** Always update GEMINI.md with the latest project status after completing a milestone.
 - **Documentation:** Add extensive documentation to any critical piece of code as comments.
 - **Centralized Configuration:** Any piece of code needing to use profiles should look in `backend/src/config.ts`.

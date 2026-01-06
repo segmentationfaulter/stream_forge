@@ -3,14 +3,14 @@
 **Goal:** Implement a modular, protocol-compliant TUS server in Bun that is decoupled from the main application logic, making it suitable for future extraction as a standalone npm package.
 
 ## Milestone 1: Architecture & Contracts
-- [ ] Define the `DataStore` interface (`src/lib/tus/interfaces/DataStore.ts`) - the contract for storage drivers (create, append, getStat, etc.).
-- [ ] Define `TusConfig` and `TusRequest/Response` types (`src/lib/tus/types.ts`) to ensure framework agnosticism.
-- [ ] Create the `TusServer` class skeleton (`src/lib/tus/index.ts`) - the main entry point that dispatches requests to handlers.
+- [x] Define the `DataStore` interface (`src/lib/tus/interfaces/DataStore.ts`) - the contract for storage drivers (create, append, getStat, etc.).
+- [x] Define `TusConfig` and `TusRequest/Response` types (`src/lib/tus/types.ts`) to ensure framework agnosticism.
+- [x] Create the `TusServer` class skeleton (`src/lib/tus/index.ts`) - the main entry point that dispatches requests to handlers.
 
 ## Milestone 2: The Storage Driver
-- [ ] Implement `FileStore` class (`src/lib/tus/stores/FileStore.ts`) implementing `DataStore`.
-- [ ] Implement file locking mechanism within `FileStore` to ensure concurrency safety.
-- [ ] Ensure `FileStore` handles `Bun.file()` and streams efficiently using non-blocking I/O.
+- [x] Implement `createFileStore` factory (`src/lib/tus/stores/FileStore.ts`) returning `DataStore`.
+- [x] Implement file locking mechanism within `FileStore` to ensure concurrency safety.
+- [x] Ensure `FileStore` handles `Bun.file()` and streams efficiently using non-blocking I/O.
 
 ## Milestone 3: Protocol Core (POST & HEAD)
 - [ ] Implement `handlePost` - generic logic for creating uploads, validating headers, and calling `store.create()`.
